@@ -48,9 +48,8 @@
     const form = document.getElementById("contactForm");
     const statusMsg = document.getElementById("statusMsg");
 
-    // callback สำหรับ JSONP
-    function handleResponse(response) {
-      if (response.status === "success") {
+    function handleResponse(e) {
+      if (e.result === "success") {
         statusMsg.textContent = "บันทึกข้อมูลเรียบร้อย ✅";
         form.reset();
       } else {
@@ -58,15 +57,14 @@
       }
     }
 
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-
+    form.addEventListener("submit", function(ev) {
+      ev.preventDefault();
+      const name = encodeURIComponent(document.getElementById("name").value);
+      const phone = encodeURIComponent(document.getElementById("phone").value);
       const callback = "handleResponse";
-      const url = `${scriptURL}?callback=${callback}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
-
-      // สร้าง <script> เพื่อโหลด JSONP
+      const url = `${scriptURL}?callback=${callback}&name=${name}&phone=${phone}`;
+      
+      // สร้าง script tag สำหรับ JSONP
       const script = document.createElement("script");
       script.src = url;
       document.body.appendChild(script);
