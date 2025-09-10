@@ -44,22 +44,32 @@
   </main>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwZfPPBeJc4TFJWhZ8UMPP2cXexnTBaKGALK4A5YC4/exec"; // <--- ใส่ URL ของ Web App ที่สร้างจาก Apps Script
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwZfPPBeJc4TFJWhZ8UMPP2cXexnTBaKGALK4A5YC4/exec";
     const form = document.getElementById("contactForm");
     const statusMsg = document.getElementById("statusMsg");
 
+    // callback สำหรับ JSONP
+    function handleResponse(response) {
+      if (response.status === "success") {
+        statusMsg.textContent = "บันทึกข้อมูลเรียบร้อย ✅";
+        form.reset();
+      } else {
+        statusMsg.textContent = "เกิดข้อผิดพลาด ❌";
+      }
+    }
+
     form.addEventListener("submit", e => {
       e.preventDefault();
-      const formData = new FormData(form);
-      fetch(scriptURL, { method: "POST", body: formData })
-        .then(response => {
-          statusMsg.textContent = "บันทึกข้อมูลเรียบร้อย ✅";
-          form.reset();
-        })
-        .catch(error => {
-          statusMsg.textContent = "เกิดข้อผิดพลาด ❌";
-          console.error("Error!", error);
-        });
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+
+      const callback = "handleResponse";
+      const url = `${scriptURL}?callback=${callback}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+
+      // สร้าง <script> เพื่อโหลด JSONP
+      const script = document.createElement("script");
+      script.src = url;
+      document.body.appendChild(script);
     });
   </script>
 </body>
